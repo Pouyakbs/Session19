@@ -1,0 +1,160 @@
+﻿@{ ViewData["Title"] = "Home Page"; }
+<div id="div1" class="border border-danger">
+    <h1>First Demo</h1>
+    <button id="helloJq">Show Message</button>
+
+
+
+</div>
+<div id="div2" class="border border-danger">
+    <h1>Counter</h1>
+    <h1 id="counter">15</h1>
+    <button id="incr">+</button>
+    <button id="dec">-</button>
+
+
+
+</div>
+<div id="div3" class="border border-danger">
+    <h1>Search Demo</h1>
+    <input id="search" type="text" placeholder="search here" />
+    <div id="result"></div>
+</div>
+
+<div id="div4" class="border border-danger">
+    <h1>Cities</h1>
+    <form method="post">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="control-label"> Select </label>
+
+                    <select id="countryList" name="cities" class="form-control" asp-items="@ViewBag.cities"></select>
+                    <select id="cityList" class="form-control"></select>
+
+
+                </div>
+                <button type="button" href="#" class="btn btn-primary" id="btnAdd">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<form asp-controller="Home" asp-action="UploadFile" method="post" enctype="multipart/form-data">
+
+
+    <input type="file" name="files" />
+    <input type="file" name="files" />
+    <input type="file" name="files" />
+    <input type="file" name="files" />
+    <button type="submit">Upload File</button>
+</form>
+
+<script>
+
+    $(document).ready(function () {
+        $("#countryList").change(function () {
+            var country = $("#countryList").val()
+            $.ajax({
+                url: "home/GetCities",
+                data: { country: country },
+                success: function (result) {
+                    var format = ""
+                    console.log(result)
+                    for (var i = 0; i < result.length; i++) {
+                        format += `<option value=${result[i].key}>${result[i].value}</option>`
+                        format += `<button type="button" href="#" class="btn btn-primary" id="btnAdd">Submit</button>`
+                    }
+                    $("#cityList").html(format)
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+
+        })
+        $("#btnAdd").click(function () {
+            var country = $("#countryList").val()
+            var cities = $("#cityList").val()
+            console.log(cities)
+            $.ajax({
+                url: "home/Get",
+                data: { country: country, city: cities },
+                type: "POST",
+                success: function (result) {
+                    console.log(result)
+                    $(this).text(result)
+                }
+            });
+        })
+
+    })
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#search").keyup(function () {
+            var search = $(this).val()
+            $.ajax({
+                url: "home/searchnames",
+                data: { q: search },
+
+                success: function (result) {
+                    var format = "<ul>"
+                    for (var i = 0; i < result.length; i++) {
+                        format += "<li>" + result[i] + "</li>"
+                    }
+                    format += "</ul>"
+                    $("#result").html(format);
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+
+        });
+    });
+</script>
+
+
+
+
+
+<script>
+    $(document).ready(function () {
+        $("#helloJq").click(function () {
+
+            $.ajax({
+                url: "home/GetContent",
+
+                success: function (result) {
+                    $("#div1").html(result);
+                }
+            });
+        });
+    });
+
+
+    $(document).ready(function () {
+
+        $("#incr").click(function () {
+            var count = $('#counter').text()
+            $.ajax({
+                url: "home/IncrementCounter",
+                data: { value: count },
+                /*contentType: 'application/json; charset=utf-8',*/
+                success: function (result) {
+                    console.log(result)
+                    $('#counter').text(result)
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        });
+    });
+
+
+
+</script>
